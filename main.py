@@ -6,12 +6,23 @@ import os
 import importlib
 from mathutils import *
 
+
 dir = os.path.dirname(bpy.data.filepath)
 sys.path.append(dir)
-importlib.reload(wavefunction)
-importlib.reload(utils)
 import utils
 import wavefunction
+
+importlib.reload(wavefunction)
+importlib.reload(utils)
+
+
+
+dir = os.path.dirname(bpy.data.filepath)
+sys.path.append(dir)
+#sys.path.append(dir)
+#importlib.reload(wavefunction)
+#importlib.reload(utils)
+
 
 
 # todo naming
@@ -34,7 +45,7 @@ print(f'\n{utils.color.GREEN}{utils.color.BOLD}--CHOOSING STARTING TILE AND CELL
 
 # choose a random starting cell
 wave.set_starting_state(top='air')
-wave.set_start((2, 2, 0), 'Cube.017')
+wave.set_start(tile='Plande.008')
 
 print(f'{utils.color.GREEN}{utils.color.BOLD}--COLLAPSING--{utils.color.END}{utils.color.REV}\n')
 

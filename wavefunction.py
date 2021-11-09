@@ -3,11 +3,10 @@ import bpy
 import sys
 import random
 from mathutils import *
-sys.path.append('//utils.py')
 
 
 class waveFunction:
-    def __init__(self, database: dict, size: tuple) -> None:
+    def __init__(self, database: dict, size: tuple):
         self.database = database
         self.size = size
 
@@ -24,11 +23,19 @@ class waveFunction:
                 self.cellGrid[x].append([])
                 for z in range(self.size[2]):
                     self.cellGrid[x][y].append(self.tileList.copy())
+        
+        self.errors = 0
 
     def update_cell(self, source: tuple, target: tuple, direction: str):
         availableSource = self.cellGrid[source[0]][source[1]][source[2]]
         availableTarget = self.cellGrid[target[0]][target[1]][target[2]]
+        #print(availableSource)
+        #print(availableTarget)
         updated = False
+        if availableSource == ['error']:
+            return False
+        if availableTarget == ['error']:
+            return False
 
         possibleTilesList = []
         for targ in availableTarget:
@@ -47,9 +54,11 @@ class waveFunction:
                 availableSource.remove(tileSource)
                 updated = True
         self.cellGrid[source[0]][source[1]][source[2]] = availableSource
+        #if no cells can be put next to this one, an error is raised
         if availableSource == []:
-            print(f'{color.REV}{color.RED} EMPTY CELL{color.END}')
-            self.cellGrid[source[0]][source[1]][source[2]] = ['air']
+            #print(f'{color.REV}{color.RED} EMPTY CELL{color.END}')
+            self.cellGrid[source[0]][source[1]][source[2]] = ['error']  
+            self.errors +=1
         return updated
 
     def propagate(self):
@@ -159,9 +168,9 @@ class waveFunction:
         progress = f'{round(progress *100,2)}%'
         sys.stdout.write('\u001b[1A')
         sys.stdout.write('\u001b[1000D')
-        sys.stdout.write('Progress  |Cells to update|Steps\n')
+        sys.stdout.write('Progress  |Cells to update|Steps     |Errors\n')
         sys.stdout.write(
-            f'{progress:<10}|{len(self.tilesToUpdate):<15}|{steps:<5}')
+            f'{progress:<10}|{len(self.tilesToUpdate):<15}|{steps:<10}|{self.errors:<6}')
         sys.stdout.flush()
 
     def set_starting_state(self, left: str = -1, right: str = -1, front: str = -1, back: str = -1, top: str = -1, bottom: str = -1):
@@ -204,7 +213,7 @@ class waveFunction:
             startZ = coordinates[2]
         
         if tile == -1:
-            tile = self.tileList[random.randint(0,self.tileList-1)]
+            tile = self.tileList[random.randint(0,len(self.tileList)-1)]
 
         startingCell = self.set_cell((startX, startY, startZ), tile)
         self.update_adjacent((startX, startY, startZ))

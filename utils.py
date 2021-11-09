@@ -2,7 +2,8 @@ import bpy
 import math
 import sys
 from mathutils import *
-
+import os
+dir = os.path.dirname(bpy.data.filepath)
 
 class color:
     PURPLE = '\033[95m'
@@ -205,7 +206,10 @@ def cleanup(size):
     for x in range(size[0]):
         for y in range(size[1]):
             for z in range(size[2]):
-                bpy.data.objects[f'{x}.{y}.{z}.mesh'].select_set(True)
+                try :
+                    bpy.data.objects[f'{x}.{y}.{z}.mesh'].select_set(True)
+                except KeyError:
+                    pass
                 done += 1
                 progress_bar(done, size[0]*size[1]*size[2], 5)
 
@@ -234,16 +238,19 @@ def preview_grid(size: tuple, cellGrid: list):
             for z in range(size[2]):
                 availableTiles = cellGrid[x][y][z]
                 if len(availableTiles) == 1:
-                    bpy.ops.object.add_named(name=availableTiles[0])
-                    """
-                    bpy.ops.object.select_all(action='DESELECT')
-                    bpy.context.view_layer.objects.active = bpy.data.objects[availableTiles[0]]
-                    bpy.data.objects[availableTiles[0]].select_set(True)
-                    bpy.ops.object.duplicate(linked=True, mode='TRANSLATION')
-                    """
-                    bpy.context.active_object.name = f'{x}.{y}.{z}.mesh'
-                    bpy.data.objects[f'{x}.{y}.{z}.mesh'].location = (
-                        x*2, y*2, z*2)
+                    if availableTiles[0] == 'error':
+                        pass
+                    else :
+                        bpy.ops.object.add_named(name=availableTiles[0])
+                        """
+                        bpy.ops.object.select_all(action='DESELECT')
+                        bpy.context.view_layer.objects.active = bpy.data.objects[availableTiles[0]]
+                        bpy.data.objects[availableTiles[0]].select_set(True)
+                        bpy.ops.object.duplicate(linked=True, mode='TRANSLATION')
+                        """
+                        bpy.context.active_object.name = f'{x}.{y}.{z}.mesh'
+                        bpy.data.objects[f'{x}.{y}.{z}.mesh'].location = (
+                            x*2, y*2, z*2)
                 else:
                     pass
                     #create_text_object(f'{x}.{y}.{z}.text', (x*2, y*2, z*2), str(len(availableTiles)))
@@ -293,7 +300,7 @@ def preview_single_key(database: dict, key):
 
 def render_step(step, size, cellGrid):
     preview_grid(size, cellGrid)
-    bpy.context.scene.render.filepath = f'D:/Programming/017_blender/render2/img2_{step}.png'
+    bpy.context.scene.render.filepath = f'{dir}/img_{step}.png'
     bpy.context.scene.render.resolution_x = 1920
     bpy.context.scene.render.resolution_y = 1080
     bpy.ops.render.render(write_still=True)
