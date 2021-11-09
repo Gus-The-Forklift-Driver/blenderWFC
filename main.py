@@ -1,6 +1,4 @@
-import utils
 import json
-import wavefunction
 import bpy
 import random
 import sys
@@ -12,6 +10,8 @@ dir = os.path.dirname(bpy.data.filepath)
 sys.path.append(dir)
 importlib.reload(wavefunction)
 importlib.reload(utils)
+import utils
+import wavefunction
 
 
 # todo naming
