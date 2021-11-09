@@ -202,6 +202,9 @@ class waveFunction:
             startX = coordinates[0]
             startY = coordinates[1]
             startZ = coordinates[2]
+        
+        if tile == -1:
+            tile = self.tileList[random.randint(0,self.tileList-1)]
 
         startingCell = self.set_cell((startX, startY, startZ), tile)
         self.update_adjacent((startX, startY, startZ))
