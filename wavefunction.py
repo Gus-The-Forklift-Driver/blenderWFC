@@ -1,4 +1,3 @@
-from utils import color
 import bpy
 import sys
 import random
@@ -23,14 +22,14 @@ class waveFunction:
                 self.cellGrid[x].append([])
                 for z in range(self.size[2]):
                     self.cellGrid[x][y].append(self.tileList.copy())
-        
+
         self.errors = 0
 
     def update_cell(self, source: tuple, target: tuple, direction: str):
         availableSource = self.cellGrid[source[0]][source[1]][source[2]]
         availableTarget = self.cellGrid[target[0]][target[1]][target[2]]
-        #print(availableSource)
-        #print(availableTarget)
+        # print(availableSource)
+        # print(availableTarget)
         updated = False
         if availableSource == ['error']:
             return False
@@ -54,11 +53,11 @@ class waveFunction:
                 availableSource.remove(tileSource)
                 updated = True
         self.cellGrid[source[0]][source[1]][source[2]] = availableSource
-        #if no cells can be put next to this one, an error is raised
+        # if no cells can be put next to this one, an error is raised
         if availableSource == []:
             #print(f'{color.REV}{color.RED} EMPTY CELL{color.END}')
-            self.cellGrid[source[0]][source[1]][source[2]] = ['error']  
-            self.errors +=1
+            self.cellGrid[source[0]][source[1]][source[2]] = ['error']
+            self.errors += 1
         return updated
 
     def propagate(self):
@@ -211,10 +210,10 @@ class waveFunction:
             startX = coordinates[0]
             startY = coordinates[1]
             startZ = coordinates[2]
-        
+
         if tile == -1:
-            tile = self.tileList[random.randint(0,len(self.tileList)-1)]
+            tile = self.tileList[random.randint(0, len(self.tileList)-1)]
 
         startingCell = self.set_cell((startX, startY, startZ), tile)
         self.update_adjacent((startX, startY, startZ))
-        print(f'{color.GREEN}Starting at {startX}.{startY}.{startZ} with tile : {str(startingCell)}{color.END}')
+        #print(f'{color.GREEN}Starting at {startX}.{startY}.{startZ} with tile : {str(startingCell)}{color.END}')

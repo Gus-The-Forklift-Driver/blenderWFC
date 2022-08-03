@@ -1,36 +1,7 @@
 import bpy
-import math
-import sys
 from mathutils import *
+import json
 import os
-
-
-class color:
-    PURPLE = '\033[95m'
-    CYAN = '\033[96m'
-    DARKCYAN = '\033[36m'
-    BLUE = '\033[94m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    RED = '\033[91m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-    REV = '\u001b[7m'
-    END = '\033[0m'
-
-
-def progress_bar(progress: int, max: int, step: int):
-    if progress % step == 0:
-        progress = progress / max * 100
-        width = int((progress + 1) / 4)
-        bar = "[" + "#" * width + " " * (25 - width) + "]"
-        progress = f'{round(progress,2)}%'
-
-        sys.stdout.write('\u001b[1000D')
-        sys.stdout.write(f'{bar}{progress}')
-        sys.stdout.flush()
-
-# Calculate if two points are overlapping within a given threshold.
 
 
 def is_overlapping(point1: Vector, point2: Vector, direction: str, threshold=0.001) -> bool:
@@ -144,7 +115,6 @@ def is_mesh_compatible(object1: object, object2: object, direction: str, thresho
             return True
         else:
             return False
-
     elif direction == 'z+':
         for verts in object1.data.vertices:
             if verts.co.z == 1:
@@ -193,130 +163,45 @@ def is_mesh_compatible(object1: object, object2: object, direction: str, thresho
         return False
 
 
-def create_text_object(name, coordinates, text):
-    font_curve = bpy.data.curves.new(type="FONT", name="Font Curve")
-    font_curve.body = text
-    font_obj = bpy.data.objects.new(name=name, object_data=font_curve)
-    bpy.context.scene.collection.objects.link(font_obj)
-    bpy.data.objects[name].location = coordinates
+class databaseMaker:
+    def __init__(self):
+        self.dir = os.path.dirname(bpy.data.filepath)
 
+        # print(f'{color.BOLD}{color.CYAN}***************************************{color.END}')
 
-def cleanup(size):
-    done = 0
-    for x in range(size[0]):
-        for y in range(size[1]):
-            for z in range(size[2]):
-                try:
-                    bpy.data.objects[f'{x}.{y}.{z}.mesh'].select_set(True)
-                except KeyError:
-                    pass
-                done += 1
-                progress_bar(done, size[0]*size[1]*size[2], 5)
+        # obj = bpy.data.objects["Cube"]  # particular object by name
 
-    objs = bpy.context.selected_objects
-    coll_target = bpy.context.scene.collection.children.get("Grid")
-    # If target found and object list not empty
-    if coll_target and objs:
+    def save_database_to_file(self, database, name='database.json'):
+        databaseFile = open(f'{self.dir}/{name}', 'w')
+        databaseFile.write(str(json.dumps(database)))
+        databaseFile.close()
+        print(f'saved file to : {self.dir}/{name}')
 
-        # Loop through all objects
-        for ob in objs:
-            # Loop through all collections the obj is linked to
-            for coll in ob.users_collection:
-                # Unlink the object
-                coll.objects.unlink(ob)
-
-            # Link each object to the target collection
-            coll_target.objects.link(ob)
-        # bpy.data.collections["grid"].objects.link(bpy.data.objects[f'{x}.{y}.{z}.mesh'])
-
-
-def preview_grid(size: tuple, cellGrid: list):
-    done = 0
-    print('\n')
-    for x in range(size[0]):
-        for y in range(size[1]):
-            for z in range(size[2]):
-                availableTiles = cellGrid[x][y][z]
-                if len(availableTiles) == 1:
-                    if availableTiles[0] == 'error':
-                        pass
-                    else:
-                        try:
-                            bpy.ops.object.add_named(name=availableTiles[0])
-                        except:
-                            print(
-                                f'failed to add tile : {availableTiles[0]} at {x}.{y}.{z}')
-                        else:
-                            bpy.context.active_object.name = f'{x}.{y}.{z}.mesh'
-                            bpy.data.objects[f'{x}.{y}.{z}.mesh'].location = (
-                                x*2, y*2, z*2)
-                else:
-                    pass
-                    #create_text_object(f'{x}.{y}.{z}.text', (x*2, y*2, z*2), str(len(availableTiles)))
-                done += 1
-                progress_bar(done, size[0]*size[1]*size[2], 20)
-
-
-def preview_object(location: tuple, objectName):
-    bpy.ops.object.select_all(action='DESELECT')
-    bpy.context.view_layer.objects.active = bpy.data.objects[objectName]
-    bpy.data.objects[objectName].select_set(True)
-    bpy.ops.object.duplicate(linked=True, mode='TRANSLATION')
-    bpy.context.active_object.name = f'prev_{location[0]}.{location[1]}.{location[2]}.{objectName}'
-    bpy.data.objects[f'prev_{location[0]}.{location[1]}.{location[2]}.{objectName}'].location = (
-        location[0], location[1], location[2])
-
-
-def preview_single_key(database: dict, key):
-    preview_object((0, 0, 0), key)
-    offset = 1
-    for x in database[key]['x+']:
-        preview_object((offset*2, 0, 0), x)
-        offset = offset + 1
-    offset = 1
-    for x in database[key]['x-']:
-        preview_object((offset*-2, 0, 0), x)
-        offset = offset + 1
-
-    offset = 1
-    for y in database[key]['y+']:
-        preview_object((0, offset*2, 0), y)
-        offset = offset + 1
-    offset = 1
-    for y in database[key]['y-']:
-        preview_object((0, offset*-2, 0), y)
-        offset = offset + 1
-
-    offset = 1
-    for z in database[key]['z+']:
-        preview_object((0, 0, offset*2), z)
-        offset = offset + 1
-    offset = 1
-    for z in database[key]['z-']:
-        preview_object((0, 0, offset*-2), z)
-        offset = offset + 1
-
-
-def render_step(step, size, cellGrid):
-    dir = os.path.dirname(bpy.data.filepath)
-    preview_grid(size, cellGrid)
-    bpy.context.scene.render.filepath = f'{dir}/img_{step}.png'
-    bpy.context.scene.render.resolution_x = 1920
-    bpy.context.scene.render.resolution_y = 1080
-    bpy.ops.render.render(write_still=True)
-    for x in range(size[0]):
-        for y in range(size[1]):
-            for z in range(size[2]):
-                try:
-                    bpy.data.objects.remove(
-                        bpy.data.objects[f'{x}.{y}.{z}.mesh'], do_unlink=True)
-                except:
-                    pass
-
-
-def clean_meshes():
-    for obj in bpy.data.objects:
-        for verts in obj.data.vertices:
-            verts.co.x = round(verts.co.x, 2)
-            verts.co.y = round(verts.co.y, 2)
-            verts.co.z = round(verts.co.z, 2)
+    def create_database(self, threshold=0.001):
+        database = {}
+        for object in bpy.context.selected_objects:
+            if object.type == 'MESH':
+                database[object.name] = {}
+                database[object.name]['x+'] = []
+                database[object.name]['x-'] = []
+                database[object.name]['y+'] = []
+                database[object.name]['y-'] = []
+                database[object.name]['z+'] = []
+                database[object.name]['z-'] = []
+                for target in bpy.context.selected_objects:
+                    if target.type == 'MESH':
+                        #print(f'Source : {object.name} | Destination : {target.name}')
+                        if is_mesh_compatible(object, target, 'x+', threshold):
+                            #print(f'{color.BOLD}{color.GREEN}{object.name} compatible on the X+ with {target.name}{color.END}')
+                            database[object.name]['x+'].append(target.name)
+                        if is_mesh_compatible(object, target, 'x-', threshold):
+                            database[object.name]['x-'].append(target.name)
+                        if is_mesh_compatible(object, target, 'y+', threshold):
+                            database[object.name]['y+'].append(target.name)
+                        if is_mesh_compatible(object, target, 'y-', threshold):
+                            database[object.name]['y-'].append(target.name)
+                        if is_mesh_compatible(object, target, 'z+', threshold):
+                            database[object.name]['z+'].append(target.name)
+                        if is_mesh_compatible(object, target, 'z-', threshold):
+                            database[object.name]['z-'].append(target.name)
+        return database
