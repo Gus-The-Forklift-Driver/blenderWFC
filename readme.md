@@ -29,7 +29,9 @@ Right now the addon doesn't have an interface although you can use the Operator 
 
 ## Example
 
-![result]
+![result](https://github.com/Gus-The-Forklift-Driver/blenderWFC/blob/master/media/simpleExample.png)
+
+![tileset](https://github.com/Gus-The-Forklift-Driver/blenderWFC/blob/master/media/simpleExampleTileset.png)
 
 
 ## TODO
