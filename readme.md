@@ -47,7 +47,7 @@ Right now the addon doesn't have an interface although you can use the Operator 
 
 ## Current limitation and future plans
 
-- Right now the size of the grid is fixed, if you wish to change the size of the grid you must edit the code of the addon (this will be changed when there is an iterface)
+- ~~Right now the size of the grid is fixed, if you wish to change the size of the grid you must edit the code of the addon (this will be changed when there is an iterface)~~
 - Be aware that for the matching to work the adjacents faces needs the vertices to be at the same local coordinates.
 - The dataset creation is a bit picky and can skip meshes that should match together. If this happend to you try using the `clean meshes` function to fix the issue.
 
