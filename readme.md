@@ -15,7 +15,7 @@ locate your .zip file and click install addon.
 
 ## Usage
 
-Right now the addon doesn't have an interface although you can use the Operator search [^operator] to get the functions currently implemented :
+~~Right now the addon doesn't have an interface although~~ you can use the Operator search [^operator] to get the functions currently implemented :
 - Clean Meshes
 > This function rounds the vertices location making the meshes matching easier (this might cause some visual changes to your meshes)
 - Create database
@@ -36,12 +36,11 @@ Right now the addon doesn't have an interface although you can use the Operator 
 
 ## TODO
 
-- [x] create a interface
-    - [ ] Add all options and operators
+- [X] create a interface
 - [ ] weight for tiles
 - [ ] tutorial video
 - [ ] improve the database creation process
-- [ ] collection managment
+- [ ] database managment
 - [ ] animation of the collapse
 - [ ] custom size and shape grid
 

@@ -314,9 +314,15 @@ def render_step(step, size, cellGrid):
                     pass
 
 
-def clean_meshes():
-    for obj in bpy.data.objects:
-        for verts in obj.data.vertices:
-            verts.co.x = round(verts.co.x, 2)
-            verts.co.y = round(verts.co.y, 2)
-            verts.co.z = round(verts.co.z, 2)
+def clean_meshes(decimalLenght: int = 2):
+    if bpy.context.selected_objects == []:
+        objects = bpy.context.scene.objects
+    else:
+        objects = bpy.context.selected_objects
+
+    for object in objects:
+        if object.type == 'MESH':
+            for verts in object.data.vertices:
+                verts.co.x = round(verts.co.x, decimalLenght)
+                verts.co.y = round(verts.co.y, decimalLenght)
+                verts.co.z = round(verts.co.z, decimalLenght)

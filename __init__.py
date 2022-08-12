@@ -59,32 +59,55 @@ class ObjectMoveX(bpy.types.Operator):
 
 
 # creates the interface for the wfc
-class WfcPanel(bpy.types.Panel):
+class runWfcPanel(bpy.types.Panel):
     # usefull guide to make blender panels :
     # https://medium.com/geekculture/creating-a-custom-panel-with-blenders-python-api-b9602d890663
     """create a panel"""
-    bl_label = "wfc"
-    bl_idname = "VIEW3D_PT_wfc"
+    bl_label = "run wfc"
+    bl_idname = "VIEW3D_PT_runWfc"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Wavefunction"
 
     def draw(self, context):
-        # layout = self.layout
-        # # Big render button
-        # layout.label(text="Big Button:")
-        # row = layout.row()
-        # row.scale_y = 3.0
-        # row.operator("render.render")
+        layout = self.layout
+        scene = context.scene
+        layout.prop(scene, 'wfc_size')
+        layout.operator('wfc.run', text='Run wave function')
 
-        col = self.layout.column()
-        for (prop_name, _) in PROPS:
-            row = col.row()
-            row.prop(context.scene, prop_name)
-        col.operator('wfc.run', text='Run wave function')
+
+class CreateWfcDatabasePanel(bpy.types.Panel):
+    """create a panel"""
+    bl_label = "Create database"
+    bl_idname = "VIEW3D_PT_createDatabase"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Wavefunction"
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        layout.operator('wfc.create_database', text='Create database')
+
+
+class ToolsPanel(bpy.types.Panel):
+    """create a panel"""
+    bl_label = "Tools"
+    bl_idname = "VIEW3D_PT_wfcTools"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Wavefunction"
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        layout.prop(scene, 'wfc_tools_decimalLenght')
+        layout.operator('wfc.clean_meshes', text='Clean meshes')
 
 
 # creates the database from the selected meshes and saves it into a file
+
+
 class CreateAndSaveDatabase(bpy.types.Operator):
     """Create and save the WFC in a json file"""      # Use this as a tooltip for menu items and buttons.
     bl_idname = "wfc.create_database"        # Unique identifier for buttons and menu items to reference.
@@ -108,7 +131,7 @@ class runWaveFunction(bpy.types.Operator):
 
     def execute(self, context):
         # read the parameters
-        size = context.scene.sizeX
+        size = context.scene.wfc_size
         print(size[0])
 
         # read the database
@@ -151,7 +174,7 @@ class cleanMeshes(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        utils.clean_meshes()
+        utils.clean_meshes(context.scene.wfc_tools_decimalLenght)
         return {'FINISHED'}
 
 
@@ -160,13 +183,17 @@ CLASSES = [
     CreateAndSaveDatabase,
     runWaveFunction,
     cleanMeshes,
-    WfcPanel
+    CreateWfcDatabasePanel,
+    runWfcPanel,
+    ToolsPanel,
 ]
 
 PROPS = [
     #('prefix', bpy.props.StringProperty(name='Prefix', default='Pref')),
-    ('sizeX', bpy.props.IntVectorProperty(
-        name='size', default=(5, 5, 5), min=1, soft_max=20))
+    ('wfc_size', bpy.props.IntVectorProperty(
+        name='size', default=(5, 5, 5), min=1, soft_max=20)),
+    ('wfc_tools_decimalLenght', bpy.props.IntProperty(
+        name='decimal lenght', min=0, max=10, soft_min=1, soft_max=4)),
 ]
 
 
