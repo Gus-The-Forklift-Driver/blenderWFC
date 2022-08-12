@@ -36,7 +36,8 @@ Right now the addon doesn't have an interface although you can use the Operator 
 
 ## TODO
 
-- [ ] create a interface
+- [x] create a interface
+    - [ ] Add all options and operators
 - [ ] weight for tiles
 - [ ] tutorial video
 - [ ] improve the database creation process
