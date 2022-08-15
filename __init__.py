@@ -3,7 +3,7 @@
 
 # WFC:
 # create empty grid
-# fill it according to the parameters given (with veights as well)
+# fill it according to the parameters given (with weights as well)
 # choose starting location
 
 # collapse
