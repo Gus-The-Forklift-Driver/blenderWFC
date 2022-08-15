@@ -16,7 +16,10 @@ import os
 import json
 from . import database
 from . import wavefunction
+from . import databaseManagment
 from . import utils
+
+# TODO create rotated variations of a single tile
 
 bl_info = {
     "name": "BlenderWFC",
@@ -36,29 +39,9 @@ class helloWorld(bpy.types.Operator):
     bl_label = "Print Hello World"         # Display name in the interface.
     bl_options = {'REGISTER', 'UNDO'}  # Enable undo for the operator.
 
-    def execute(self, context):
-        print('hello world')
-        return {'FINISHED'}
-
-
-class ObjectMoveX(bpy.types.Operator):
-    """My Object Moving Script"""      # Use this as a tooltip for menu items and buttons.
-    bl_idname = "object.move_x"        # Unique identifier for buttons and menu items to reference.
-    bl_label = "Move X by One"         # Display name in the interface.
-    bl_options = {'REGISTER', 'UNDO'}  # Enable undo for the operator.
-
-    # execute() is called when running the operator.
-    def execute(self, context):
-
-        # The original script
-        scene = context.scene
-        for obj in scene.objects:
-            obj.location.x += 1.0
-
-        return {'FINISHED'}
-
-
 # creates the interface for the wfc
+
+
 class runWfcPanel(bpy.types.Panel):
     # usefull guide to make blender panels :
     # https://medium.com/geekculture/creating-a-custom-panel-with-blenders-python-api-b9602d890663
@@ -90,6 +73,20 @@ class CreateWfcDatabasePanel(bpy.types.Panel):
         layout.operator('wfc.create_database', text='Create database')
 
 
+class databaseManagmentPanel(bpy.types.Panel):
+    """create a panel"""
+    bl_label = "Database Managment"
+    bl_idname = "VIEW3D_PT_wfcDatabaseManagment"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Wavefunction"
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        layout.operator('wfc.enable_disable_dbm', text='enable / disable')
+
+
 class ToolsPanel(bpy.types.Panel):
     """create a panel"""
     bl_label = "Tools"
@@ -101,6 +98,7 @@ class ToolsPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         scene = context.scene
+        layout.label(text='Round mesh vertex coordinates : ')
         layout.prop(scene, 'wfc_tools_decimalLenght')
         layout.operator('wfc.clean_meshes', text='Clean meshes')
 
@@ -120,6 +118,7 @@ class CreateAndSaveDatabase(bpy.types.Operator):
         d.save_database_to_file(d.create_database())
         return {'FINISHED'}
     # TODO : save the file within the blender file
+# TODO : option to use objects in a collection as tiles for the database
 # TODO : option to load and save the database to external file
 
 
@@ -167,6 +166,22 @@ class runWaveFunction(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class enableDisableDbM(bpy.types.Operator):
+    bl_idname = "wfc.enable_disable_dbm"
+    bl_label = "enables or disables the db managment"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        is_DbManagmentEnabled = context.scene.wfc_DbManagment
+        if is_DbManagmentEnabled:
+            databaseManagment.disableDbManagment()
+            context.scene.wfc_DbManagment = False
+        else:
+            databaseManagment.enableDbManagment()
+            context.scene.wfc_DbManagment = True
+        return {'FINISHED'}
+
+
 class cleanMeshes(bpy.types.Operator):
     """round the vertices of every selected meshes"""
     bl_idname = "wfc.clean_meshes"
@@ -179,19 +194,28 @@ class cleanMeshes(bpy.types.Operator):
 
 
 CLASSES = [
-    helloWorld,
+    # operators
     CreateAndSaveDatabase,
     runWaveFunction,
     cleanMeshes,
+    enableDisableDbM,
+    # panels
     CreateWfcDatabasePanel,
     runWfcPanel,
+    databaseManagmentPanel,
     ToolsPanel,
 ]
 
 PROPS = [
     #('prefix', bpy.props.StringProperty(name='Prefix', default='Pref')),
+    # wfc settings
     ('wfc_size', bpy.props.IntVectorProperty(
         name='size', default=(5, 5, 5), min=1, soft_max=20)),
+
+    # wfc db managment
+    ('wfc_DbManagment', bpy.props.BoolProperty(name='DbManagment', default=False)),
+
+    # wfc tools
     ('wfc_tools_decimalLenght', bpy.props.IntProperty(
         name='decimal lenght', min=0, max=10, soft_min=1, soft_max=4)),
 ]
