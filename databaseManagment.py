@@ -7,7 +7,7 @@ from . import utils
 # Db is short for database
 
 
-currentEditedTile = ''
+currentEditedTile = 0
 
 
 def enableDbManagment():
@@ -29,35 +29,44 @@ def disableDbManagment():
         object.hide_viewport = False
 
 
-def displayTile(tileToDisplay: str = 'Cube.027'):
-    database
-    utils.preview_object((0, 0, 0), tileToDisplay)
+def displayTile(tileToDisplay: str = '', tileIndex: int = None):
+    global currentEditedTile
+    if tileIndex != None:
+        currentEditedTile += tileIndex
+        tileToDisplay = list(database)[currentEditedTile]
+    utils.duplicate_object((0, 0, 0), tileToDisplay)
     offset = 1
     for x in database[tileToDisplay]['x+']:
-        utils.preview_object((offset*2, 0, 0), x)
+        utils.duplicate_object((offset*2, 0, 0), x)
         offset = offset + 1
     offset = 1
     for x in database[tileToDisplay]['x-']:
-        utils.preview_object((offset*-2, 0, 0), x)
+        utils.duplicate_object((offset*-2, 0, 0), x)
         offset = offset + 1
 
     offset = 1
     for y in database[tileToDisplay]['y+']:
-        utils.preview_object((0, offset*2, 0), y)
+        utils.duplicate_object((0, offset*2, 0), y)
         offset = offset + 1
     offset = 1
     for y in database[tileToDisplay]['y-']:
-        utils.preview_object((0, offset*-2, 0), y)
+        utils.duplicate_object((0, offset*-2, 0), y)
         offset = offset + 1
 
     offset = 1
     for z in database[tileToDisplay]['z+']:
-        utils.preview_object((0, 0, offset*2), z)
+        utils.duplicate_object((0, 0, offset*2), z)
         offset = offset + 1
     offset = 1
     for z in database[tileToDisplay]['z-']:
-        utils.preview_object((0, 0, offset*-2), z)
+        utils.duplicate_object((0, 0, offset*-2), z)
         offset = offset + 1
+
+
+def removeCurrentlyDisplayedTile():
+    for object in bpy.context.scene.objects:
+        if object.hide_viewport == False:
+            bpy.data.objects.remove(object, do_unlink=True)
 
 
 def updateTile(tileToUpdate: str):

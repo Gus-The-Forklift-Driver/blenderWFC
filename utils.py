@@ -257,7 +257,7 @@ def preview_grid(size: tuple, cellGrid: list):
                 progress_bar(done, size[0]*size[1]*size[2], 20)
 
 
-def preview_object(location: tuple, objectName):
+def duplicate_object(location: tuple, objectName, prefix='prev_'):
     # get the object to duplicate
     obj = bpy.data.objects[objectName]
     # make a copy of it
@@ -267,36 +267,38 @@ def preview_object(location: tuple, objectName):
     # change location
     duplicate.location = location
     # change name
-    duplicate.name = f'prev_{location[0]}.{location[1]}.{location[2]}.{objectName}'
+    duplicate.name = f'{prefix}{location[0]}.{location[1]}.{location[2]}.{objectName}'
+    # display it (only useful in db managment mode)
+    duplicate.hide_viewport = False
 
 
 def preview_single_key(database: dict, key):
-    preview_object((0, 0, 0), key)
+    duplicate_object((0, 0, 0), key)
     offset = 1
     for x in database[key]['x+']:
-        preview_object((offset*2, 0, 0), x)
+        duplicate_object((offset*2, 0, 0), x)
         offset = offset + 1
     offset = 1
     for x in database[key]['x-']:
-        preview_object((offset*-2, 0, 0), x)
+        duplicate_object((offset*-2, 0, 0), x)
         offset = offset + 1
 
     offset = 1
     for y in database[key]['y+']:
-        preview_object((0, offset*2, 0), y)
+        duplicate_object((0, offset*2, 0), y)
         offset = offset + 1
     offset = 1
     for y in database[key]['y-']:
-        preview_object((0, offset*-2, 0), y)
+        duplicate_object((0, offset*-2, 0), y)
         offset = offset + 1
 
     offset = 1
     for z in database[key]['z+']:
-        preview_object((0, 0, offset*2), z)
+        duplicate_object((0, 0, offset*2), z)
         offset = offset + 1
     offset = 1
     for z in database[key]['z-']:
-        preview_object((0, 0, offset*-2), z)
+        duplicate_object((0, 0, offset*-2), z)
         offset = offset + 1
 
 

@@ -87,7 +87,9 @@ class databaseManagmentPanel(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         layout.operator('wfc.enable_disable_dbm', text='enable / disable')
-        layout.operator('wfc.display_tile', text='display single tile')
+        row = layout.row(align=True)
+        row.operator('wfc.display_previous_tile', text='<< previous tile')
+        row.operator('wfc.display_next_tile', text='next tile >>')
 
 
 class ToolsPanel(bpy.types.Panel):
@@ -168,16 +170,6 @@ class runWaveFunction(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class displayTile(bpy.types.Operator):
-    bl_idname = "wfc.display_tile"
-    bl_label = "dislplay the matching tiles for a tile"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        databaseManagment.displayTile()
-        return {'FINISHED'}
-
-
 class enableDisableDbM(bpy.types.Operator):
     bl_idname = "wfc.enable_disable_dbm"
     bl_label = "enables or disables the db managment"
@@ -186,11 +178,39 @@ class enableDisableDbM(bpy.types.Operator):
     def execute(self, context):
         is_DbManagmentEnabled = context.scene.wfc_DbManagment
         if is_DbManagmentEnabled:
+            databaseManagment.removeCurrentlyDisplayedTile()
             databaseManagment.disableDbManagment()
             context.scene.wfc_DbManagment = False
         else:
             databaseManagment.enableDbManagment()
+            databaseManagment.displayTile(tileIndex=0)
             context.scene.wfc_DbManagment = True
+        return {'FINISHED'}
+
+
+class displayNextTile(bpy.types.Operator):
+    bl_idname = "wfc.display_next_tile"
+    bl_label = 'changes the current displayed tile in db managment'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        # remove the displayed tile
+        # TODO check if they were created from the db managment
+        databaseManagment.removeCurrentlyDisplayedTile()
+        databaseManagment.displayTile(tileIndex=1)
+        return {'FINISHED'}
+
+
+class displayPreviousTile(bpy.types.Operator):
+    bl_idname = "wfc.display_previous_tile"
+    bl_label = 'changes the current displayed tile in db managment'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        # remove the displayed tile
+        # TODO check if they were created from the db managment
+        databaseManagment.removeCurrentlyDisplayedTile()
+        databaseManagment.displayTile(tileIndex=-1)
         return {'FINISHED'}
 
 
@@ -204,6 +224,17 @@ class cleanMeshes(bpy.types.Operator):
         utils.clean_meshes(context.scene.wfc_tools_decimalLenght)
         return {'FINISHED'}
 
+# TODO move all propreties into this class
+
+
+class wfcPropertiesGroup(bpy.types.PropertyGroup):
+    testint = bpy.props.IntProperty(
+        name="testint",
+        description="",
+        default=1,
+        min=1,
+    )
+
 
 CLASSES = [
     # operators
@@ -211,7 +242,8 @@ CLASSES = [
     runWaveFunction,
     cleanMeshes,
     enableDisableDbM,
-    displayTile,
+    displayNextTile,
+    displayPreviousTile,
     # panels
     CreateWfcDatabasePanel,
     runWfcPanel,
