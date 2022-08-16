@@ -258,13 +258,16 @@ def preview_grid(size: tuple, cellGrid: list):
 
 
 def preview_object(location: tuple, objectName):
-    bpy.ops.object.select_all(action='DESELECT')
-    bpy.context.view_layer.objects.active = bpy.data.objects[objectName]
-    bpy.data.objects[objectName].select_set(True)
-    bpy.ops.object.duplicate(linked=True, mode='TRANSLATION')
-    bpy.context.active_object.name = f'prev_{location[0]}.{location[1]}.{location[2]}.{objectName}'
-    bpy.data.objects[f'prev_{location[0]}.{location[1]}.{location[2]}.{objectName}'].location = (
-        location[0], location[1], location[2])
+    # get the object to duplicate
+    obj = bpy.data.objects[objectName]
+    # make a copy of it
+    duplicate = obj.copy()
+    # link it to a collection
+    bpy.context.scene.collection.objects.link(duplicate)
+    # change location
+    duplicate.location = location
+    # change name
+    duplicate.name = f'prev_{location[0]}.{location[1]}.{location[2]}.{objectName}'
 
 
 def preview_single_key(database: dict, key):
