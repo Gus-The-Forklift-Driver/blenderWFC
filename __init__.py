@@ -34,10 +34,12 @@ bl_info = {
 
 
 class helloWorld(bpy.types.Operator):
-    """Prints hello world into the console"""      # Use this as a tooltip for menu items and buttons.
-    bl_idname = "object.hello_world"        # Unique identifier for buttons and menu items to reference.
-    bl_label = "Print Hello World"         # Display name in the interface.
-    bl_options = {'REGISTER', 'UNDO'}  # Enable undo for the operator.
+    bl_idname = "object.hello_world"
+    bl_label = "Print Hello World"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        return {'FINISHED'}
 
 # creates the interface for the wfc
 
@@ -85,6 +87,7 @@ class databaseManagmentPanel(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         layout.operator('wfc.enable_disable_dbm', text='enable / disable')
+        layout.operator('wfc.display_tile', text='display single tile')
 
 
 class ToolsPanel(bpy.types.Panel):
@@ -131,7 +134,6 @@ class runWaveFunction(bpy.types.Operator):
     def execute(self, context):
         # read the parameters
         size = context.scene.wfc_size
-        print(size[0])
 
         # read the database
         dir = os.path.dirname(bpy.data.filepath)
@@ -163,6 +165,16 @@ class runWaveFunction(bpy.types.Operator):
         # print(wave.cellGrid)
         utils.preview_grid(size, wave.cellGrid)
 
+        return {'FINISHED'}
+
+
+class displayTile(bpy.types.Operator):
+    bl_idname = "wfc.display_tile"
+    bl_label = "dislplay the matching tiles for a tile"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        databaseManagment.displayTile()
         return {'FINISHED'}
 
 
@@ -199,6 +211,7 @@ CLASSES = [
     runWaveFunction,
     cleanMeshes,
     enableDisableDbM,
+    displayTile,
     # panels
     CreateWfcDatabasePanel,
     runWfcPanel,
