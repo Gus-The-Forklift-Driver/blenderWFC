@@ -10,6 +10,7 @@
 # update the neighboring cells that need to be updated
 # repeat
 
+from unittest import expectedFailure
 import bpy
 import sys
 import os
@@ -87,6 +88,7 @@ class databaseManagmentPanel(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         layout.operator('wfc.enable_disable_dbm', text='enable / disable')
+        layout.label(text=context.scene.wfc.current_edited_tile)
         row = layout.row(align=True)
         row.operator('wfc.display_previous_tile', text='<< previous tile')
         row.operator('wfc.display_next_tile', text='next tile >>')
@@ -104,7 +106,7 @@ class ToolsPanel(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         layout.label(text='Round mesh vertex coordinates : ')
-        layout.prop(scene, 'wfc_tools_decimalLenght')
+        layout.prop(scene.wfc, 'tools_decimalLenght')
         layout.operator('wfc.clean_meshes', text='Clean meshes')
 
 
@@ -183,7 +185,8 @@ class enableDisableDbM(bpy.types.Operator):
             context.scene.wfc_DbManagment = False
         else:
             databaseManagment.enableDbManagment()
-            databaseManagment.displayTile(tileIndex=0)
+            context.scene.wfc.current_edited_tile = databaseManagment.displayTile(
+                tileIndex=0)
             context.scene.wfc_DbManagment = True
         return {'FINISHED'}
 
@@ -197,7 +200,8 @@ class displayNextTile(bpy.types.Operator):
         # remove the displayed tile
         # TODO check if they were created from the db managment
         databaseManagment.removeCurrentlyDisplayedTile()
-        databaseManagment.displayTile(tileIndex=1)
+        context.scene.wfc.current_edited_tile = databaseManagment.displayTile(
+            tileIndex=1)
         return {'FINISHED'}
 
 
@@ -210,7 +214,8 @@ class displayPreviousTile(bpy.types.Operator):
         # remove the displayed tile
         # TODO check if they were created from the db managment
         databaseManagment.removeCurrentlyDisplayedTile()
-        databaseManagment.displayTile(tileIndex=-1)
+        context.scene.wfc.current_edited_tile = databaseManagment.displayTile(
+            tileIndex=-1)
         return {'FINISHED'}
 
 
@@ -221,22 +226,22 @@ class cleanMeshes(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        utils.clean_meshes(context.scene.wfc_tools_decimalLenght)
+        utils.clean_meshes(context.scene.wfc.tools_decimalLenght)
         return {'FINISHED'}
 
 # TODO move all propreties into this class
 
 
 class wfcPropertiesGroup(bpy.types.PropertyGroup):
-    testint = bpy.props.IntProperty(
-        name="testint",
-        description="",
-        default=1,
-        min=1,
-    )
+    #testint = bpy.props.IntProperty(name="testint",description="",default=1,min=1,)
+    current_edited_tile: bpy.props.StringProperty(name='current_edited_tile')
+    tools_decimalLenght: bpy.props.IntProperty(
+        name='decimal lenght', min=0, max=10, soft_min=1, soft_max=4)
 
 
 CLASSES = [
+    # property group
+    wfcPropertiesGroup,
     # operators
     CreateAndSaveDatabase,
     runWaveFunction,
@@ -249,6 +254,7 @@ CLASSES = [
     runWfcPanel,
     databaseManagmentPanel,
     ToolsPanel,
+
 ]
 
 PROPS = [
@@ -268,10 +274,12 @@ PROPS = [
 
 def register():
     print(f'**** Registring {len(CLASSES)} class')
-
     for c in CLASSES:
         bpy.utils.register_class(c)
     print('**** Done')
+
+    # register the property group
+    bpy.types.Scene.wfc = bpy.props.PointerProperty(type=wfcPropertiesGroup)
 
     for (prop_name, prop_value) in PROPS:
         setattr(bpy.types.Scene, prop_name, prop_value)
@@ -282,6 +290,9 @@ def unregister():
     for c in CLASSES:
         bpy.utils.unregister_class(c)
     print('**** Done')
+
+    # delete the proterty group
+    del bpy.types.Scene.wfc
 
     for (prop_name, _) in PROPS:
         delattr(bpy.types.Scene, prop_name)

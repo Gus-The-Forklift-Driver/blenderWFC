@@ -61,6 +61,7 @@ def displayTile(tileToDisplay: str = '', tileIndex: int = None):
     for z in database[tileToDisplay]['z-']:
         utils.duplicate_object((0, 0, offset*-2), z)
         offset = offset + 1
+    return tileToDisplay
 
 
 def removeCurrentlyDisplayedTile():
