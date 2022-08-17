@@ -58,7 +58,7 @@ class runWfcPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         scene = context.scene
-        layout.prop(scene, 'wfc_size')
+        layout.prop(scene.wfc, 'size')
         layout.operator('wfc.run', text='Run wave function')
 
 
@@ -137,7 +137,7 @@ class runWaveFunction(bpy.types.Operator):
 
     def execute(self, context):
         # read the parameters
-        size = context.scene.wfc_size
+        size = context.scene.wfc.size
 
         # read the database
         dir = os.path.dirname(bpy.data.filepath)
@@ -178,16 +178,16 @@ class enableDisableDbM(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        is_DbManagmentEnabled = context.scene.wfc_DbManagment
+        is_DbManagmentEnabled = context.scene.wfc.DbManagment
         if is_DbManagmentEnabled:
             databaseManagment.removeCurrentlyDisplayedTile()
             databaseManagment.disableDbManagment()
-            context.scene.wfc_DbManagment = False
+            context.scene.wfc.DbManagment = False
         else:
             databaseManagment.enableDbManagment()
             context.scene.wfc.current_edited_tile = databaseManagment.displayTile(
                 tileIndex=0)
-            context.scene.wfc_DbManagment = True
+            context.scene.wfc.DbManagment = True
         return {'FINISHED'}
 
 
@@ -237,6 +237,9 @@ class wfcPropertiesGroup(bpy.types.PropertyGroup):
     current_edited_tile: bpy.props.StringProperty(name='current_edited_tile')
     tools_decimalLenght: bpy.props.IntProperty(
         name='decimal lenght', min=0, max=10, soft_min=1, soft_max=4)
+    size: bpy.props.IntVectorProperty(
+        name='size', default=(5, 5, 5), min=1, soft_max=20)
+    DbManagment: bpy.props.BoolProperty(name='DbManagment', default=False)
 
 
 CLASSES = [
@@ -257,20 +260,6 @@ CLASSES = [
 
 ]
 
-PROPS = [
-    #('prefix', bpy.props.StringProperty(name='Prefix', default='Pref')),
-    # wfc settings
-    ('wfc_size', bpy.props.IntVectorProperty(
-        name='size', default=(5, 5, 5), min=1, soft_max=20)),
-
-    # wfc db managment
-    ('wfc_DbManagment', bpy.props.BoolProperty(name='DbManagment', default=False)),
-
-    # wfc tools
-    ('wfc_tools_decimalLenght', bpy.props.IntProperty(
-        name='decimal lenght', min=0, max=10, soft_min=1, soft_max=4)),
-]
-
 
 def register():
     print(f'**** Registring {len(CLASSES)} class')
@@ -281,9 +270,6 @@ def register():
     # register the property group
     bpy.types.Scene.wfc = bpy.props.PointerProperty(type=wfcPropertiesGroup)
 
-    for (prop_name, prop_value) in PROPS:
-        setattr(bpy.types.Scene, prop_name, prop_value)
-
 
 def unregister():
     print(f'**** Unregistring {len(CLASSES)} class')
@@ -293,6 +279,3 @@ def unregister():
 
     # delete the proterty group
     del bpy.types.Scene.wfc
-
-    for (prop_name, _) in PROPS:
-        delattr(bpy.types.Scene, prop_name)
