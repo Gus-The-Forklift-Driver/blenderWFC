@@ -205,3 +205,10 @@ class databaseMaker:
                         if is_mesh_compatible(object, target, 'z-', threshold):
                             database[object.name]['z-'].append(target.name)
         return database
+
+    def sortDatabaseKeys(self, database):
+        sortedKeys = sorted(database)
+        sortedDatabase = {}
+        for key in sortedKeys:
+            sortedDatabase[key] = database[key]
+        return sortedDatabase

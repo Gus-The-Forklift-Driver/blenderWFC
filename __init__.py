@@ -129,7 +129,9 @@ class CreateAndSaveDatabase(bpy.types.Operator):
     # execute() is called when running the operator.
     def execute(self, context):
         d = database.databaseMaker()
-        d.save_database_to_file(d.create_database())
+        db = d.create_database()
+        db = d.sortDatabaseKeys(db)
+        d.save_database_to_file(db)
         return {'FINISHED'}
     # TODO : save the file within the blender file
 # TODO : option to use objects in a collection as tiles for the database
