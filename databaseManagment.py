@@ -25,6 +25,8 @@ def enableDbManagment():
 
 def disableDbManagment():
     print('disabling database managment')
+    global currentEditedTile
+    currentEditedTile = 0
     for object in bpy.context.scene.objects:
         object.hide_viewport = False
 
@@ -33,6 +35,8 @@ def displayTile(tileToDisplay: str = '', tileIndex: int = None):
     global currentEditedTile
     if tileIndex != None:
         currentEditedTile += tileIndex
+        if currentEditedTile > len(list(database))-1 or currentEditedTile < 0:
+            currentEditedTile -= tileIndex
         tileToDisplay = list(database)[currentEditedTile]
     utils.duplicate_object((0, 0, 0), tileToDisplay)
     offset = 1

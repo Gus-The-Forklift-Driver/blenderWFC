@@ -183,6 +183,7 @@ class enableDisableDbM(bpy.types.Operator):
             databaseManagment.removeCurrentlyDisplayedTile()
             databaseManagment.disableDbManagment()
             context.scene.wfc.DbManagment = False
+            context.scene.wfc.current_edited_tile = ''
         else:
             databaseManagment.enableDbManagment()
             context.scene.wfc.current_edited_tile = databaseManagment.displayTile(
