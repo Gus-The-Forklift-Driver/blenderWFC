@@ -87,11 +87,18 @@ class databaseManagmentPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         scene = context.scene
-        layout.operator('wfc.enable_disable_dbm', text='enable / disable')
-        layout.label(text=context.scene.wfc.current_edited_tile)
-        row = layout.row(align=True)
-        row.operator('wfc.display_previous_tile', text='<< previous tile')
-        row.operator('wfc.display_next_tile', text='next tile >>')
+        if context.scene.wfc.DbManagment == True:
+            layout.operator('wfc.enable_disable_dbm',
+                            text='disable database Managment')
+        else:
+            layout.operator('wfc.enable_disable_dbm',
+                            text='enable database Managment')
+        if context.scene.wfc.DbManagment == True:
+            if context.scene.wfc.current_edited_tile != '':
+                layout.label(text=context.scene.wfc.current_edited_tile)
+            row = layout.row(align=True)
+            row.operator('wfc.display_previous_tile', text='<< previous tile')
+            row.operator('wfc.display_next_tile', text='next tile >>')
 
 
 class ToolsPanel(bpy.types.Panel):
