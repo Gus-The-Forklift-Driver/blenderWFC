@@ -242,14 +242,11 @@ def preview_grid(size: tuple, cellGrid: list):
                         pass
                     else:
                         try:
-                            bpy.ops.object.add_named(name=availableTiles[0])
+                            duplicate_object(
+                                (x*2, y*2, z*2), availableTiles[0], 'wfc_')
                         except:
                             print(
                                 f'failed to add tile : {availableTiles[0]} at {x}.{y}.{z}')
-                        else:
-                            bpy.context.active_object.name = f'{x}.{y}.{z}.mesh'
-                            bpy.data.objects[f'{x}.{y}.{z}.mesh'].location = (
-                                x*2, y*2, z*2)
                 else:
                     pass
                     #create_text_object(f'{x}.{y}.{z}.text', (x*2, y*2, z*2), str(len(availableTiles)))
@@ -263,13 +260,15 @@ def duplicate_object(location: tuple, objectName, prefix='prev_'):
     # make a copy of it
     duplicate = obj.copy()
     # link it to a collection
-    bpy.context.scene.collection.objects.link(duplicate)
+
     # change location
     duplicate.location = location
     # change name
     duplicate.name = f'{prefix}{location[0]}.{location[1]}.{location[2]}.{objectName}'
     # display it (only useful in db managment mode)
     duplicate.hide_viewport = False
+    # link it to a collection
+    bpy.context.scene.collection.objects.link(duplicate)
 
 
 def preview_single_key(database: dict, key):
