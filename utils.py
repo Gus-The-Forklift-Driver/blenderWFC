@@ -264,10 +264,12 @@ def duplicate_object(location: tuple, objectName, prefix='prev_', tile_type=''):
     # change location
     duplicate.location = location
     # change name
-    duplicate.name = f'{prefix}{location[0]}.{location[1]}.{location[2]}.{objectName}'
+    duplicate.name = f'{prefix}{objectName}'
     # display it (only useful in db managment mode)
     duplicate.hide_viewport = False
     duplicate.wfc_object.tile_type = tile_type
+    if tile_type == 'TILEPREV':
+        duplicate.wfc_object.tile_name = objectName
     # link it to a collection
     bpy.context.scene.collection.objects.link(duplicate)
 

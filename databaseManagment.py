@@ -1,5 +1,6 @@
 from operator import truediv
 import bpy
+from mathutils import Vector
 import json
 import os
 from . import utils
@@ -20,10 +21,11 @@ def enableDbManagment():
     database = json.loads(databaseFile.read())
     # hide every objects
     for object in bpy.context.scene.objects:
-        if object.wfc_object.tile_type == 'DBTILE':
-            pass
-        else:
-            object.hide_viewport = True
+        # if object.wfc_object.tile_type == 'DBTILE':
+        #     pass
+        # else:
+        #     object.hide_viewport = True
+        object.hide_viewport = True
 
 
 def disableDbManagment():
@@ -83,11 +85,56 @@ def neighbouringTile():
     for object in bpy.context.scene.objects:
         if object.wfc_object.tile_type == 'TILEPREV':
             tiles.append(object)
-    print(tiles)
+        elif object.hide_viewport == False and not object.wfc_object.tile_type == 'DBTILE':
+            tiles.append(object)
     # check their coordinates and add them to the proper key
+    updatedDb = {}
+    updatedDb['x+'] = []
+    updatedDb['x-'] = []
+    updatedDb['y+'] = []
+    updatedDb['y-'] = []
+    updatedDb['z+'] = []
+    updatedDb['z-'] = []
+    for object in tiles:
+        location = tuple(object.location)
+        highest_index = location.index(max(location))
+        lowest_index = location.index(min(location))
+        if location == (0.0, 0.0, 0.0):
+            continue
+        if object.wfc_object.tile_name != '' and object.wfc_object.tile_type == 'TILEPREV':
+            tile_name = object.wfc_object.tile_name
+        else:
+            tile_name = object.name
+            # this gives added tiles the wfc_object values
+            object.wfc_object.tile_type = 'TILEPREV'
+            object.wfc_object.tile_name = tile_name
+
+        if abs(location[highest_index]) > abs(location[lowest_index]) and highest_index == 0:
+            updatedDb['x+'].append(tile_name)
+        elif abs(location[highest_index]) < abs(location[lowest_index]) and lowest_index == 0:
+            updatedDb['x-'].append(tile_name)
+
+        elif abs(location[highest_index]) > abs(location[lowest_index]) and highest_index == 1:
+            updatedDb['y+'].append(tile_name)
+        elif abs(location[highest_index]) < abs(location[lowest_index]) and lowest_index == 1:
+            updatedDb['y-'].append(tile_name)
+
+        elif abs(location[highest_index]) > abs(location[lowest_index]) and highest_index == 2:
+            updatedDb['z+'].append(tile_name)
+        elif abs(location[highest_index]) < abs(location[lowest_index]) and lowest_index == 2:
+            updatedDb['z-'].append(tile_name)
+
+        else:
+            print(f'failed to add {tile_name}')
+    return updatedDb
+
+
+def updateDb(self, tileValues):
+    tile_name = list(database)[currentEditedTile]
+    dir = os.path.dirname(bpy.data.filepath)
+    databaseFile = open(f'{dir}/database.json', 'r')
+    print(f'saving : {dir}/database.json \n\n')
+
+    # update key
 
     return
-
-
-def updateDb(self):
-    pass

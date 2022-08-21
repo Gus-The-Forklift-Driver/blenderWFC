@@ -234,7 +234,8 @@ class updateTile(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        databaseManagment.neighbouringTile()
+        updatedTileValues = databaseManagment.neighbouringTile()
+        databaseManagment.updateDb(updatedTileValues)
         return {'FINISHED'}
 
 
@@ -263,6 +264,7 @@ class wfcPropertiesGroup(bpy.types.PropertyGroup):
 
 class wfcObjectPropertiesGroup(bpy.types.PropertyGroup):
     tile_type: bpy.props.StringProperty(name='tile_type')
+    tile_name: bpy.props.StringProperty(name='tile_name')
 
 
 CLASSES = [
