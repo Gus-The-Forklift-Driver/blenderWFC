@@ -10,15 +10,13 @@
 # update the neighboring cells that need to be updated
 # repeat
 
-from unittest import expectedFailure
-import bpy
-import sys
-import os
 import json
-from . import database
-from . import wavefunction
-from . import databaseManagment
-from . import utils
+import os
+from pickle import TRUE
+
+import bpy
+
+from . import database, databaseManagment, utils, wavefunction
 
 # TODO create rotated variations of a single tile
 
@@ -26,8 +24,8 @@ bl_info = {
     "name": "BlenderWFC",
     "author": "Smonking_Sheep",
     "description": "",
-    "blender": (2, 80, 0),
-    "version": (0, 0, 2),
+    "blender": (3, 2, 1),
+    "version": (0, 0, 3),
     "location": "",
     "warning": "",
     "category": "Generic"
@@ -87,6 +85,7 @@ class databaseManagmentPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         scene = context.scene
+
         if context.scene.wfc.DbManagment == True:
             layout.operator('wfc.enable_disable_dbm',
                             text='disable database Managment')
@@ -99,6 +98,7 @@ class databaseManagmentPanel(bpy.types.Panel):
             row = layout.row(align=True)
             row.operator('wfc.display_previous_tile', text='<< previous tile')
             row.operator('wfc.display_next_tile', text='next tile >>')
+            layout.operator('wfc.update_tile', text='Update tile')
 
 
 class ToolsPanel(bpy.types.Panel):
@@ -187,8 +187,7 @@ class enableDisableDbM(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        is_DbManagmentEnabled = context.scene.wfc.DbManagment
-        if is_DbManagmentEnabled:
+        if context.scene.wfc.DbManagment == True:
             databaseManagment.removeCurrentlyDisplayedTile()
             databaseManagment.disableDbManagment()
             context.scene.wfc.DbManagment = False
@@ -229,6 +228,16 @@ class displayPreviousTile(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class updateTile(bpy.types.Operator):
+    bl_idname = "wfc.update_tile"
+    bl_label = 'update the object available tiles with the ones present'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        databaseManagment.neighbouringTile()
+        return {'FINISHED'}
+
+
 class cleanMeshes(bpy.types.Operator):
     """round the vertices of every selected meshes"""
     bl_idname = "wfc.clean_meshes"
@@ -252,9 +261,14 @@ class wfcPropertiesGroup(bpy.types.PropertyGroup):
     DbManagment: bpy.props.BoolProperty(name='DbManagment', default=False)
 
 
+class wfcObjectPropertiesGroup(bpy.types.PropertyGroup):
+    tile_type: bpy.props.StringProperty(name='tile_type')
+
+
 CLASSES = [
     # property group
     wfcPropertiesGroup,
+    wfcObjectPropertiesGroup,
     # operators
     CreateAndSaveDatabase,
     runWaveFunction,
@@ -262,6 +276,7 @@ CLASSES = [
     enableDisableDbM,
     displayNextTile,
     displayPreviousTile,
+    updateTile,
     # panels
     CreateWfcDatabasePanel,
     runWfcPanel,
@@ -279,6 +294,8 @@ def register():
 
     # register the property group
     bpy.types.Scene.wfc = bpy.props.PointerProperty(type=wfcPropertiesGroup)
+    bpy.types.Object.wfc_object = bpy.props.PointerProperty(
+        type=wfcObjectPropertiesGroup)
 
 
 def unregister():
@@ -289,3 +306,4 @@ def unregister():
 
     # delete the proterty group
     del bpy.types.Scene.wfc
+    del bpy.types.Object.wfc_object

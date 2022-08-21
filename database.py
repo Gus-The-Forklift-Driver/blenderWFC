@@ -181,6 +181,7 @@ class databaseMaker:
         database = {}
         for object in bpy.context.selected_objects:
             if object.type == 'MESH':
+                object.wfc_object.tile_type = 'DBTILE'
                 database[object.name] = {}
                 database[object.name]['x+'] = []
                 database[object.name]['x-'] = []

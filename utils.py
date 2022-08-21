@@ -254,7 +254,7 @@ def preview_grid(size: tuple, cellGrid: list):
                 progress_bar(done, size[0]*size[1]*size[2], 20)
 
 
-def duplicate_object(location: tuple, objectName, prefix='prev_'):
+def duplicate_object(location: tuple, objectName, prefix='prev_', tile_type=''):
     # get the object to duplicate
     obj = bpy.data.objects[objectName]
     # make a copy of it
@@ -267,6 +267,7 @@ def duplicate_object(location: tuple, objectName, prefix='prev_'):
     duplicate.name = f'{prefix}{location[0]}.{location[1]}.{location[2]}.{objectName}'
     # display it (only useful in db managment mode)
     duplicate.hide_viewport = False
+    duplicate.wfc_object.tile_type = tile_type
     # link it to a collection
     bpy.context.scene.collection.objects.link(duplicate)
 
