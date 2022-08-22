@@ -8,7 +8,7 @@ A great [video explanation](https://www.youtube.com/watch?v=2SuvO4Gi7uY) from Ma
 
 ## Installation
 
-Download the repo in the release tab for stable version or on the main page for dev version.
+Download the repo in the [release](https://github.com/Gus-The-Forklift-Driver/blenderWFC/releases) tab for stable version or on the main page for dev version.
 
 In blender head to edit > Preferences > Add-ons > Install...
 locate your .zip file and click install addon.
@@ -40,9 +40,9 @@ locate your .zip file and click install addon.
 - [ ] weight for tiles
 - [ ] tutorial video
 - [ ] improve the database creation process
-- [ ] database managment
+- [X] database managment
 - [ ] animation of the collapse
-- [ ] custom size and shape grid
+- [X] custom size ~~and shape grid~~
 
 ## Current limitation and future plans
 
