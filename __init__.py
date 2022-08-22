@@ -250,6 +250,8 @@ class updateTile(bpy.types.Operator):
     def execute(self, context):
         updatedTileValues = databaseManagment.neighbouringTile()
         databaseManagment.updateDb(updatedTileValues)
+        databaseManagment.removeCurrentlyDisplayedTile()
+        databaseManagment.displayTile(tileIndex=0)
         return {'FINISHED'}
 
 

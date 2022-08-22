@@ -129,12 +129,14 @@ def neighbouringTile():
     return updatedDb
 
 
-def updateDb(self, tileValues):
+def updateDb(tileValues):
     tile_name = list(database)[currentEditedTile]
     dir = os.path.dirname(bpy.data.filepath)
-    databaseFile = open(f'{dir}/database.json', 'r')
-    print(f'saving : {dir}/database.json \n\n')
+    database[tile_name] = tileValues
 
-    # update key
+    databaseFile = open(f'{dir}/database.json', 'w')
+    databaseFile.write(str(json.dumps(database)))
+    databaseFile.close()
+    print(f'saved file to : {dir}/database.json')
 
     return
