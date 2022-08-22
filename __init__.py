@@ -11,17 +11,7 @@
 #  ╚══╝╚══╝ ╚═╝      ╚═════╝
 
 
-# create dataset
-# edit dataset
-
-# WFC:
-# create empty grid
-# fill it according to the parameters given (with weights as well)
-# choose starting location
-
-# collapse
-# update the neighboring cells that need to be updated
-# repeat
+# next up WEIGHTS
 
 
 import json
