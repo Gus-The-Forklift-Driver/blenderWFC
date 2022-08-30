@@ -4,6 +4,20 @@ import random
 from mathutils import *
 
 
+class tileKey:
+    __slots__ = ['name', 'Xplus', 'Xminus',
+                 'Yplus', 'Yminus', 'Zplus', 'Zminus']
+
+    def __init__(self, name):
+        self.name = name
+        self.Xplus = ()
+        self.Xminus = ()
+        self.Yplus = ()
+        self.Yminus = ()
+        self.Zplus = ()
+        self.Zminus = ()
+
+
 class waveFunction:
     def __init__(self, database: dict, size: tuple):
         self.database = database

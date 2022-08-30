@@ -137,7 +137,7 @@ class CreateAndSaveDatabase(bpy.types.Operator):
         d = database.databaseMaker()
         db = d.create_database()
         db = d.sortDatabaseKeys(db)
-        d.save_database_to_file(db)
+        utils.save_database(db)
         return {'FINISHED'}
     # TODO : save the file within the blender file
 # TODO : option to use objects in a collection as tiles for the database

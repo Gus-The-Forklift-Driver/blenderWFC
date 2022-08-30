@@ -2,6 +2,7 @@ import bpy
 import sys
 from mathutils import *
 import os
+import json
 
 
 class color:
@@ -147,5 +148,9 @@ def load_database():
     return
 
 
-def save_database():
-    return
+def save_database(database, name='database.json'):
+    dir = os.path.dirname(bpy.data.filepath)
+    databaseFile = open(f'{dir}/{name}', 'w')
+    databaseFile.write(str(json.dumps(database)))
+    databaseFile.close()
+    print(f'saved file to : {dir}/{name}')

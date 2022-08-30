@@ -1,7 +1,6 @@
 import bpy
 from mathutils import *
-import json
-import os
+from . import utils
 
 
 def is_overlapping(point1: Vector, point2: Vector, direction: str, threshold=0.001) -> bool:
@@ -162,31 +161,10 @@ def is_mesh_compatible(object1: object, object2: object, direction: str, thresho
         return False
 
 
-class tileKey:
-    __slots__ = ['Xplus', 'Xminus', 'Yplus', 'Yminus', 'Zplus', 'Zminus']
-
-    def __init__(self, compatible_tiles) -> None:
-        self.Xplus = compatible_tiles['x+']
-        self.Xminus = compatible_tiles['x-']
-        self.Yplus = compatible_tiles['y+']
-        self.Yminus = compatible_tiles['y-']
-        self.Zplus = compatible_tiles['z+']
-        self.Zminus = compatible_tiles['z-']
-
-
 class databaseMaker:
     def __init__(self):
-        self.dir = os.path.dirname(bpy.data.filepath)
 
-        # print(f'{color.BOLD}{color.CYAN}***************************************{color.END}')
-
-        # obj = bpy.data.objects["Cube"]  # particular object by name
-
-    def save_database_to_file(self, database, name='database.json'):
-        databaseFile = open(f'{self.dir}/{name}', 'w')
-        databaseFile.write(str(json.dumps(database)))
-        databaseFile.close()
-        print(f'saved file to : {self.dir}/{name}')
+        pass
 
     def create_database(self, threshold=0.001):
         database = {}
