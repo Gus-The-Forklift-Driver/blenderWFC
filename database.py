@@ -24,9 +24,8 @@ def is_overlapping(point1: Vector, point2: Vector, direction: str, threshold=0.0
     else:
         return False
 
+
 # check if the vertices of an object can be connected to another object
-
-
 def is_mesh_compatible(object1: object, object2: object, direction: str, threshold=0.001) -> bool:
     object1Vertices = []
     object2Vertices = []
