@@ -162,6 +162,18 @@ def is_mesh_compatible(object1: object, object2: object, direction: str, thresho
         return False
 
 
+class tileKey:
+    __slots__ = ['Xplus', 'Xminus', 'Yplus', 'Yminus', 'Zplus', 'Zminus']
+
+    def __init__(self, compatible_tiles) -> None:
+        self.Xplus = compatible_tiles['x+']
+        self.Xminus = compatible_tiles['x-']
+        self.Yplus = compatible_tiles['y+']
+        self.Yminus = compatible_tiles['y-']
+        self.Zplus = compatible_tiles['z+']
+        self.Zminus = compatible_tiles['z-']
+
+
 class databaseMaker:
     def __init__(self):
         self.dir = os.path.dirname(bpy.data.filepath)
